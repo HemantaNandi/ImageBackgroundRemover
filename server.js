@@ -9,7 +9,11 @@ const path = require('path');
 require('dotenv').config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: '*', // Allow all origins
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'X-Api-Key'],
+}));
 app.use(bodyParser.json());
 // serve static files from project root (so index.html can be opened from server)
 app.use(express.static(path.join(__dirname)));
