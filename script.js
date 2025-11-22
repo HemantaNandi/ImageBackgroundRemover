@@ -99,6 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
         canvas.width = width;
         canvas.height = height;
         ctx.drawImage(img, 0, 0, width, height);
+
         // Create blob according to mode: preview -> PNG (preserve transparency), full -> high-quality JPEG
         let blob;
         if (mode === 'preview') {
@@ -107,22 +108,37 @@ document.addEventListener('DOMContentLoaded', () => {
             blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.95));
         }
 
-        // Use local server proxy to call remove.bg (so API key stays on server)
-        const apiUrl = '/remove-bg';
-
+        // Prepare form data
         const formData = new FormData();
         // name the file appropriately for server
         const outName = mode === 'preview' ? `upload_preview.png` : `upload_full.jpg`;
         formData.append('file', blob, outName);
 
         try {
-            // include size param so server can pass it to remove.bg if desired
+            // include size param so server or external API can handle sizing
             formData.append('size', mode === 'preview' ? 'preview' : 'auto');
-            // no client-side API key exposure: server will call remove.bg with configured size
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                body: formData,
-            });
+
+            // If the free flow initiated the request, call the external background-remover service directly
+            const externalApiUrl = 'https://background-remover-service-619657643398.us-central1.run.app/remove-background/';
+            const externalApiKey = '69909219f10ac209802d0d3972d1dad037f70e8c061edac9cbb133e4a0b1f171';
+
+            let response;
+            if (lastInitiator === 'free') {
+                // Call external API directly for free downloads (uses X-API-Key header)
+                response = await fetch(externalApiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'X-API-Key': externalApiKey,
+                    },
+                    body: formData,
+                });
+            } else {
+                // Premium or other flows go through the local server proxy which holds private keys
+                response = await fetch('/remove-bg', {
+                    method: 'POST',
+                    body: formData,
+                });
+            }
 
             const endTime = performance.now();
             const duration = ((endTime - startTime) / 1000).toFixed(2);
@@ -167,6 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // re-enable buttons after process finishes (already done above for success)
                 if (freeDownloadBtn) freeDownloadBtn.disabled = false;
                 if (premiumDownloadBtn) premiumDownloadBtn.disabled = false;
+                // re-enable buttons after process finishes
             } else {
                 const error = await response.json();
                 alert(`Error: ${error.detail}`);
@@ -282,6 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         rzp.open();
     };
+
     // Dismiss button hides the processed preview and resets the upload UI
     if (dismissBtn) {
         dismissBtn.addEventListener('click', () => {
