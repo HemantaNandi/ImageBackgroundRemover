@@ -17,10 +17,6 @@ app.use(express.static(path.join(__dirname)));
 const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID;
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
 
-if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
-  console.warn('Warning: RAZORPAY_KEY_ID or RAZORPAY_KEY_SECRET not set in environment.\n' +
-    'Set them in a .env file or environment variables before using payment endpoints.');
-}
 
 const razorpay = new Razorpay({
   key_id: RAZORPAY_KEY_ID || '',
@@ -30,9 +26,9 @@ const razorpay = new Razorpay({
 // Multer for handling multipart uploads
 const upload = multer({ storage: multer.memoryStorage() });
 
-const REMOVE_BG_KEY = process.env.REACT_APP_REMOVE_BG_API_KEY || process.env.REMOVE_BG_API_KEY;
+const REMOVE_BG_KEY = process.env.REMOVE_BG_API_KEY;
 if (!REMOVE_BG_KEY) {
-  console.warn('Warning: Remove.bg API key not set in environment (REACT_APP_REMOVE_BG_API_KEY).');
+  console.warn('Warning: Remove.bg API key not set in environment (REMOVE_BG_API_KEY).');
 }
 
 // Endpoint to proxy to remove.bg securely using server-side API key

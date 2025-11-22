@@ -1,0 +1,7 @@
+{
+  "env": {
+    "RAZORPAY_KEY_ID": "@razorpay-key-id",
+    "RAZORPAY_KEY_SECRET": "@razorpay-key-secret",
+    "REMOVE_BG_API_KEY": "@remove-bg-api-key"
+  }
+}
