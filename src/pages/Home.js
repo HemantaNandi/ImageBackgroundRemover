@@ -84,6 +84,7 @@ const Home = () => {
       name: 'Image Background Remover',
       description: 'Premium Download',
       order_id: order.id,
+      redirect: true,
       handler: async (res) => {
         const verifyRes = await fetch('http://localhost:5002/api/payment/verify', {
           method: 'POST',
