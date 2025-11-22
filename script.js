@@ -227,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Try to create an order on the server (recommended). Fallback to client-only flow if server unavailable.
         let order = null;
         try {
-            const resp = await fetch('http://localhost:3000/create-order', {
+            const resp = await fetch('http://localhost:3002/create-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ amount }),
@@ -251,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Payment succeeded on client. Verify server-side before processing.
                 // response contains: razorpay_payment_id, razorpay_order_id, razorpay_signature
                 try {
-                    const verifyResp = await fetch('http://localhost:3000/verify-payment', {
+                    const verifyResp = await fetch('http://localhost:3002/verify-payment', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
