@@ -99,7 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
         canvas.width = width;
         canvas.height = height;
         ctx.drawImage(img, 0, 0, width, height);
-
         // Create blob according to mode: preview -> PNG (preserve transparency), full -> high-quality JPEG
         let blob;
         if (mode === 'preview') {
@@ -168,7 +167,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 // re-enable buttons after process finishes (already done above for success)
                 if (freeDownloadBtn) freeDownloadBtn.disabled = false;
                 if (premiumDownloadBtn) premiumDownloadBtn.disabled = false;
-                // re-enable buttons after process finishes
             } else {
                 const error = await response.json();
                 alert(`Error: ${error.detail}`);
@@ -284,7 +282,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         rzp.open();
     };
-
     // Dismiss button hides the processed preview and resets the upload UI
     if (dismissBtn) {
         dismissBtn.addEventListener('click', () => {
