@@ -166,12 +166,20 @@ const Home = () => {
   };
   
   const downloadImage = (imageToDownload) => {
-    const link = document.createElement('a');
-    link.href = imageToDownload;
-    link.download = `background-removed.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (isMobile) {
+      // On mobile, open the image in a new tab for the user to save.
+      const newTab = window.open();
+      newTab.document.write(`<img src="${imageToDownload}" alt="processed image"/>`);
+    } else {
+      // On desktop, trigger a direct download.
+      const link = document.createElement('a');
+      link.href = imageToDownload;
+      link.download = `background-removed.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   };
 
   return (
