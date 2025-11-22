@@ -47,7 +47,7 @@ app.post('/remove-bg', upload.single('file'), async (req, res) => {
     form.append('image_file', req.file.buffer, { filename: req.file.originalname });
     form.append('size', size);
 
-    const response = await fetch('https://api.remove.bg/v1.0/removebg', {
+    const response = await fetch('https://api.remove.bg/v1.0/', {
       method: 'POST',
       headers: {
         'X-Api-Key': REMOVE_BG_KEY,
@@ -66,7 +66,7 @@ app.post('/remove-bg', upload.single('file'), async (req, res) => {
     const buffer = await response.buffer();
     res.send(buffer);
   } catch (err) {
-    console.error('remove-bg proxy error:', err);
+    console.error('Detailed remove-bg proxy error:', err);
     res.status(500).json({ error: err.message || 'remove-bg proxy failed' });
   }
 });
