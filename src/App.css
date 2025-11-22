@@ -1,6 +1,5 @@
 .App {
   min-height: 100vh;
-  background: linear-gradient(to bottom, #f0f0f0, #e0e0e0);
   padding: 20px;
   display: flex; /* Use flexbox for the app container */
   flex-direction: column; /* Stack children vertically */
