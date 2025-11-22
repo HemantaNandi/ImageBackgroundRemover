@@ -123,22 +123,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const externalApiKey = '69909219f10ac209802d0d3972d1dad037f70e8c061edac9cbb133e4a0b1f171';
 
             let response;
-            if (lastInitiator === 'free') {
-                // Call external API directly for free downloads (uses X-API-Key header)
-                response = await fetch(externalApiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'X-API-Key': externalApiKey,
-                    },
-                    body: formData,
-                });
-            } else {
-                // Premium or other flows go through the local server proxy which holds private keys
-                response = await fetch('/remove-bg', {
-                    method: 'POST',
-                    body: formData,
-                });
-            }
+            // All flows go through the local server proxy which holds private keys
+            response = await fetch('/remove-bg', {
+                method: 'POST',
+                body: formData,
+            });
 
             const endTime = performance.now();
             const duration = ((endTime - startTime) / 1000).toFixed(2);
@@ -265,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const verifyJson = await verifyResp.json();
                             if (verifyJson.verified) {
                                 // verified by server — proceed to process the image (preview-quality for premium)
-                                await processRemoval('full');
+                                await processRemoval('preview');
                         } else {
                             alert('Payment verification failed on server. Processing aborted.');
                             console.error('Server verification failed:', verifyJson);
