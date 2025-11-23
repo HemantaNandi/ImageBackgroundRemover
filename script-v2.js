@@ -131,7 +131,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
 
         const apiKey = '69909219f10ac209802d0d3972d1dad037f70e8c061edac9cbb133e4a0b1f171';
-        const apiUrl = 'https://background-remover-service-619657643398.us-central1.run.app/remove-background/';
+        const apiUrl = 'https://background-remover-839559687246.us-central1.run.app/remove-background/';
+        //'https://background-remover-service-619657643398.us-central1.run.app/remove-background/';
 
         const formData = new FormData();
         formData.append('file', blob, uploadedFile.name);
