@@ -1,126 +1,59 @@
 const express = require('express');
-const Razorpay = require('razorpay');
-const bodyParser = require('body-parser');
-const crypto = require('crypto');
-const fetch = require('node-fetch');
-const multer = require('multer');
-const cors = require('cors');
 const path = require('path');
+const cors = require('cors');
+const mongoose = require('mongoose');
+const multer = require('multer');
 require('dotenv').config();
 
+// MongoDB Connection
+const MONGO_URI = process.env.MONGO_URI;
+if (!MONGO_URI) {
+  console.warn('Warning: MongoDB connection string not set in environment (MONGO_URI).');
+} else {
+  mongoose.connect(MONGO_URI)
+    .then(() => console.log('MongoDB connected'))
+    .catch(err => console.error('MongoDB connection error:', err));
+}
+
+// Image Schema
+const imageSchema = new mongoose.Schema({
+  originalImage: { type: Buffer, required: true },
+  createdAt: { type: Date, default: Date.now }
+});
+const Image = mongoose.model('Image', imageSchema);
+
 const app = express();
-app.use(cors({
-  origin: '*', // Allow all origins
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type', 'X-Api-Key'],
-}));
-app.use(bodyParser.json());
-// serve static files from project root (so index.html can be opened from server)
+app.use(cors());
+
+const upload = multer({ storage: multer.memoryStorage() });
+
+// Endpoint to save the original image
+app.post('/save-image', upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'File is required.' });
+    }
+    const newImage = new Image({
+      originalImage: req.file.buffer
+    });
+    await newImage.save();
+    console.log('Original image saved to MongoDB.');
+    return res.status(200).json({ message: 'Image saved successfully!' });
+  } catch (err) {
+    console.error('Image save error:', err);
+    res.status(500).json({ error: err.message || 'Failed to save image.' });
+  }
+});
+
+// Serve static files from project root
 app.use(express.static(path.join(__dirname)));
 
-app.get('/', (req, res) => {
+// For any other request, serve index.html
+app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID;
-const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
-
-
-const razorpay = new Razorpay({
-  key_id: RAZORPAY_KEY_ID || '',
-  key_secret: RAZORPAY_KEY_SECRET || ''
-});
-
-// Multer for handling multipart uploads
-const upload = multer({ storage: multer.memoryStorage() });
-
-const REMOVE_BG_KEY = process.env.REMOVE_BG_API_KEY;
-if (!REMOVE_BG_KEY) {
-  console.warn('Warning: Remove.bg API key not set in environment (REMOVE_BG_API_KEY).');
-}
-
-// Endpoint to proxy to remove.bg securely using server-side API key
-app.post('/remove-bg', upload.single('file'), async (req, res) => {
-  try {
-    if (!req.file) return res.status(400).json({ error: 'file required' });
-
-    // Accept optional 'size' param from client for preview vs full
-    const size = req.body.size || 'auto';
-
-    const form = new (require('form-data'))();
-    form.append('image_file', req.file.buffer, { filename: req.file.originalname });
-    form.append('size', size);
-
-    const response = await fetch('https://api.remove.bg/v1.0/', {
-      method: 'POST',
-      headers: {
-        'X-Api-Key': REMOVE_BG_KEY,
-      },
-      body: form
-    });
-
-    if (!response.ok) {
-      const text = await response.text();
-      console.error('remove.bg error', response.status, text);
-      return res.status(response.status).send(text);
-    }
-
-    // pipe binary result back to client with content-type
-    res.set('Content-Type', response.headers.get('content-type') || 'image/png');
-    const buffer = await response.buffer();
-    res.send(buffer);
-  } catch (err) {
-    console.error('Detailed remove-bg proxy error:', err);
-    res.status(500).json({ error: err.message || 'remove-bg proxy failed' });
-  }
-});
-
-// Create order
-app.post('/create-order', async (req, res) => {
-  try {
-    const amount = req.body && req.body.amount ? parseInt(req.body.amount, 10) : null;
-    if (!amount || isNaN(amount)) {
-      return res.status(400).json({ error: 'Amount (in paise) is required in request body' });
-    }
-
-    const options = {
-      amount: amount,
-      currency: 'INR',
-      receipt: `rcpt_${Date.now()}`
-    };
-
-    const order = await razorpay.orders.create(options);
-    res.json(order);
-  } catch (err) {
-    console.error('create-order error:', err);
-    res.status(500).json({ error: err.message || 'Failed to create order' });
-  }
-});
-
-// Verify payment
-app.post('/verify-payment', (req, res) => {
-  try {
-    const { payment_id, order_id, signature } = req.body || {};
-    if (!payment_id || !order_id || !signature) {
-      return res.status(400).json({ verified: false, error: 'Missing required fields' });
-    }
-
-    const generated_signature = crypto.createHmac('sha256', RAZORPAY_KEY_SECRET || '')
-      .update(`${order_id}|${payment_id}`)
-      .digest('hex');
-
-    if (generated_signature === signature) {
-      return res.json({ verified: true });
-    }
-
-    return res.json({ verified: false, error: 'Signature mismatch' });
-  } catch (err) {
-    console.error('verify-payment error:', err);
-    res.status(500).json({ verified: false, error: err.message || 'Verification failed' });
-  }
-});
-
-const PORT = process.env.PORT || 3003;
+const PORT = process.env.PORT || 3005;
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });

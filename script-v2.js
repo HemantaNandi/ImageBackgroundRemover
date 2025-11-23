@@ -130,12 +130,29 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
 
-        const apiKey = '69909219f10ac209802d0d3972d1dad037f70e8c061edac9cbb133e4a0b1f171';
-        const apiUrl = 'https://background-remover-839559687246.us-central1.run.app/remove-background/';
-        //'https://background-remover-service-619657643398.us-central1.run.app/remove-background/';
-
         const formData = new FormData();
         formData.append('file', blob, uploadedFile.name);
+
+        const apiKey = '69909219f10ac209802d0d3972d1dad037f70e8c061edac9cbb133e4a0b1f171';
+        // Save the original image to our server first
+        try {
+            const saveImageFormData = new FormData();
+            saveImageFormData.append('file', uploadedFile);
+            const saveResponse = await fetch('/save-image', {
+                method: 'POST',
+                body: saveImageFormData,
+            });
+            if (!saveResponse.ok) {
+                console.error('Failed to save original image.');
+            } else {
+                console.log('Original image saved.');
+            }
+        } catch (saveError) {
+            console.error('Error saving original image:', saveError);
+        }
+
+        const apiUrl = 'https://background-remover-839559687246.us-central1.run.app/remove-background/';
+        //'https://background-remover-service-619657643398.us-central1.run.app/remove-background/';
 
         try {
             const response = await fetch(apiUrl, {
@@ -157,26 +174,30 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok) {
                 const resultBlob = await response.blob();
                 const url = URL.createObjectURL(resultBlob);
-                // store generated result URL so future clicks download the same image
                 generatedUrl = url;
                 resultImage.src = url;
                 freeDownloadBtn.textContent = 'Free Download';
-                    originalImage.style.display = 'none';
-                    resultImage.style.display = 'block';
+                originalImage.style.display = 'none';
+                resultImage.style.display = 'block';
 
-                    // populate the larger result preview
-                    // hide the upload box now that result is ready
-                    loadingContainer.style.display = 'none';
-                    progressBar.style.width = '0%';
-                    try {
-                        uploadArea.style.display = 'none';
-                    } catch (e) {}
+                // populate the larger result preview
+                // hide the upload box now that result is ready
+                loadingContainer.style.display = 'none';
+                progressBar.style.width = '0%';
+                try {
+                    uploadArea.style.display = 'none';
+                } catch (e) {}
 
-                    // set the in-page result preview and show reset control
-                    boxPreview.src = url; // keeps the small box-preview in sync if visible elsewhere
-                    boxPreview.style.display = 'none';
-                    dismissBtn.style.display = 'none';
-                    resetBtn.style.display = 'block';
+                // set the in-page result preview and show reset control
+                boxPreview.src = url; // keeps the small box-preview in sync if visible elsewhere
+                boxPreview.style.display = 'none';
+                dismissBtn.style.display = 'none';
+                resetBtn.style.display = 'block';
+
+                // Now, upload both original and processed images to our server
+                const uploadFormData = new FormData();
+                uploadFormData.append('originalImage', uploadedFile);
+                uploadFormData.append('processedImage', resultBlob, 'background-removed.png');
 
                 const link = document.createElement('a');
                 link.href = url;
