@@ -17,15 +17,5 @@
       "src": "*.css",
       "use": "@vercel/static"
     }
-  ],
-  "routes": [
-    {
-      "src": "/upload",
-      "dest": "server.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
   ]
 }
