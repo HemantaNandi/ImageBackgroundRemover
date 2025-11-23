@@ -18,6 +18,10 @@ app.use(bodyParser.json());
 // serve static files from project root (so index.html can be opened from server)
 app.use(express.static(path.join(__dirname)));
 
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID;
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
 
