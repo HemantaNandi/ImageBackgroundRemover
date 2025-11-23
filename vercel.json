@@ -6,6 +6,9 @@
       "use": "@vercel/node"
     }
   ],
+  "build": {
+    "command": "if [ ! -f script-v2.js ]; then echo 'Error: script-v2.js not found' && exit 1; fi"
+  },
   "routes": [
     {
       "src": "/(.*)",
