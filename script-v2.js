@@ -125,9 +125,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         canvas.width = width;
         canvas.height = height;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0, width, height);
         
-        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.9));
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
 
         const apiKey = '69909219f10ac209802d0d3972d1dad037f70e8c061edac9cbb133e4a0b1f171';
         const apiUrl = 'https://background-remover-service-619657643398.us-central1.run.app/remove-background/';
