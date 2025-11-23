@@ -3,12 +3,10 @@
   "builds": [
     {
       "src": "server.js",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": { "includeFiles": ["script-v2.js"] }
     }
   ],
-  "build": {
-    "command": "if [ ! -f script-v2.js ]; then echo 'Error: script-v2.js not found' && exit 1; fi"
-  },
   "routes": [
     {
       "src": "/(.*)",
