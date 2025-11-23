@@ -22,14 +22,6 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.get('/style.css', (req, res) => {
-  res.sendFile(path.join(__dirname, 'style.css'));
-});
-
-app.get('/script-v2.js', (req, res) => {
-  res.sendFile(path.join(__dirname, 'script-v2.js'));
-});
-
 const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID;
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
 
