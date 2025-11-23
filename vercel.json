@@ -12,6 +12,17 @@
       "dest": "server.js"
     }
   ],
+  "headers": [
+    {
+      "source": "/(.*).(js|css|html)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    }
+  ],
   "env": {
     "RAZORPAY_KEY_ID": "@razorpay-key-id",
     "RAZORPAY_KEY_SECRET": "@razorpay-key-secret",
