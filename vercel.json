@@ -6,16 +6,18 @@
       "use": "@vercel/node"
     },
     {
-      "src": "*.html",
+      "src": "public/**",
       "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/save-image",
+      "dest": "server.js"
     },
     {
-      "src": "*.js",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "*.css",
-      "use": "@vercel/static"
+      "src": "/(.*)",
+      "dest": "/$1"
     }
   ]
 }
