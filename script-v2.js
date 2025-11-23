@@ -93,9 +93,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 clearInterval(progressInterval);
             }
         }, 50);
-
+ 
         const startTime = performance.now();
-
+        let timerInterval = setInterval(() => {
+            const duration = ((performance.now() - startTime) / 1000).toFixed(2);
+            timeTakenEl.textContent = `Time taken: ${duration}s`;
+        }, 100);
+ 
         // Image scaling
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
@@ -140,13 +144,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: formData,
             });
 
+            clearInterval(timerInterval);
             const endTime = performance.now();
             const duration = ((endTime - startTime) / 1000).toFixed(2);
             timeTakenEl.textContent = `Time taken: ${duration}s`;
-
+ 
             clearInterval(progressInterval);
             progressBar.style.width = '100%';
-
+ 
             if (response.ok) {
                 const resultBlob = await response.blob();
                 const url = URL.createObjectURL(resultBlob);
