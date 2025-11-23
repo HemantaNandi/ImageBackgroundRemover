@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const baseUrl = window.location.origin.includes('localhost') ? 'http://localhost:3002' : '';
     const imageUpload = document.getElementById('image-upload');
     const uploadArea = document.getElementById('upload-area');
     const uploadContent = document.getElementById('upload-content');
@@ -135,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             } else {
                 // Premium or other flows go through the local server proxy which holds private keys
-                response = await fetch(`${baseUrl}/remove-bg`, {
+                response = await fetch('/remove-bg', {
                     method: 'POST',
                     body: formData,
                 });
@@ -228,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Try to create an order on the server (recommended). Fallback to client-only flow if server unavailable.
         let order = null;
         try {
-            const resp = await fetch(`${baseUrl}/create-order`, {
+            const resp = await fetch('/create-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ amount }),
@@ -252,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Payment succeeded on client. Verify server-side before processing.
                 // response contains: razorpay_payment_id, razorpay_order_id, razorpay_signature
                 try {
-                    const verifyResp = await fetch(`${baseUrl}/verify-payment`, {
+                    const verifyResp = await fetch('/verify-payment', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
