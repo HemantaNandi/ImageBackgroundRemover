@@ -46,14 +46,7 @@ app.post('/save-image', upload.single('file'), async (req, res) => {
 });
 
 // Serve static files from project root
-app.use(express.static(path.join(__dirname)));
+app.use(express.static(path.join(__dirname, 'public')));
 
-// For any other request, serve index.html
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-const PORT = process.env.PORT || 3005;
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
-});
+// Export the app for Vercel
+module.exports = app;
