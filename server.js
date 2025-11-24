@@ -1,9 +1,9 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const multer = require('multer');
-require('dotenv').config();
 
 // MongoDB Connection
 const MONGO_URI = process.env.MONGO_URI;
