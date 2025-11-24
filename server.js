@@ -46,7 +46,7 @@ app.post('/save-image', upload.single('file'), async (req, res) => {
 });
 
 // Serve static files from project root
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname)));
 
 // Export the app for Vercel
 module.exports = app;
